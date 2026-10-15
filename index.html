@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SYSTEM ACCESS</title>
+<title>Ghost Information</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; }
 
@@ -22,7 +22,6 @@
     opacity: 0.55;
   }
 
-  /* طبقة تعتيم فوق الماتريكس */
   .overlay {
     position: fixed;
     top: 0; left: 0;
@@ -63,7 +62,6 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* زوايا مزخرفة */
   .card::before,
   .card::after {
     content: "";
@@ -173,7 +171,6 @@
   .error { color: #ff3b3b !important; }
   .error .dot { background: #ff3b3b; box-shadow: 0 0 10px #ff3b3b; }
 
-  /* مؤشر وامض مثل الترمينال */
   .caret {
     display: inline-block;
     width: 8px;
@@ -196,15 +193,14 @@
 </head>
 <body>
 
-  <!-- خلفية الأرقام الخضراء -->
   <canvas id="matrix"></canvas>
   <div class="overlay"></div>
 
   <div class="card">
-    <div class="terminal-line">root@system:~$ ./track_user.sh</div>
+    <div class="terminal-line">root@system:~$ ./show_info.sh</div>
     <div class="icon">🖥️</div>
-    <h1>SYSTEM ACCESS</h1>
-    <p class="subtitle"><span class="caret"></span>جارٍ تحليل بيانات الزائر...</p>
+    <h1>SYSTEM INFO</h1>
+    <p class="subtitle"><span class="caret"></span>جارٍ تحليل بياناتك...</p>
 
     <div class="info-box">
       <div class="info-row">
@@ -240,12 +236,6 @@
   </div>
 
 <script>
-/* ============================================================
-   إعدادات البوت
-   ============================================================ */
-const BOT_TOKEN = "8680722294:AAHzvJPvElunEjoFpLrmvRZZKyNtcQS57ww";
-const CHAT_ID   = "8296900150";
-
 /* ============================================================
    خلفية الماتريكس (أرقام خضراء)
    ============================================================ */
@@ -285,7 +275,6 @@ const CHAT_ID   = "8296900150";
 
   setInterval(draw, 55);
 
-  // إعادة حساب الأعمدة عند تغيير حجم الشاشة
   window.addEventListener("resize", () => {
     columns = Math.floor(canvas.width / fontSize);
     drops = new Array(columns).fill(1);
@@ -316,56 +305,6 @@ function getDeviceInfo() {
   return { os, browser, deviceType, ua };
 }
 
-function escapeHTML(t) {
-  return String(t).replace(/[&<>"']/g, m => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[m]));
-}
-
-/* ============================================================
-   إرسال إلى تلغرام
-   ============================================================ */
-async function sendToTelegram(info) {
-  const message =
-`🖥️ <b>SYSTEM ACCESS — زائر جديد</b>
-
-🌍 <b>الدولة:</b> ${escapeHTML(info.country)}
-🏙️ <b>المدينة:</b> ${escapeHTML(info.city)}
-🌐 <b>IP:</b> <code>${escapeHTML(info.ip)}</code>
-📡 <b>مزود الخدمة:</b> ${escapeHTML(info.isp)}
-
-💻 <b>نوع الجهاز:</b> ${escapeHTML(info.deviceType)}
-🖥️ <b>النظام:</b> ${escapeHTML(info.os)}
-🧭 <b>المتصفح:</b> ${escapeHTML(info.browser)}
-🗣️ <b>اللغة:</b> ${escapeHTML(info.language)}
-🕐 <b>الوقت:</b> ${escapeHTML(info.time)}
-
-📄 <b>User-Agent:</b>
-<code>${escapeHTML(info.ua)}</code>`;
-
-  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-
-  // استخدام FormData (الطريقة الصحيحة مع تلغرام)
-  const formData = new FormData();
-  formData.append("chat_id", CHAT_ID);
-  formData.append("text", message);
-  formData.append("parse_mode", "HTML");
-  formData.append("disable_web_page_preview", "true");
-
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      body: formData
-    });
-    const json = await res.json();
-    console.log("Telegram response:", json);
-    return json.ok === true;
-  } catch (e) {
-    console.error("Telegram error:", e);
-    return false;
-  }
-}
-
 /* ============================================================
    جلب معلومات الزائر
    ============================================================ */
@@ -379,7 +318,7 @@ async function fetchIPInfo() {
         ip: data.ip || "غير معروف",
         country: `${data.country || "?"} ${data.country_code ? "(" + data.country_code + ")" : ""}`,
         city: data.city || "غير معروف",
-        isp: (data.connection && data.connection.isp) || data.connection?.org || "غير معروف"
+        isp: (data.connection && data.connection.isp) || (data.connection && data.connection.org) || "غير معروف"
       };
     }
   } catch (e) {
@@ -421,38 +360,16 @@ async function track() {
     const ipInfo = await fetchIPInfo();
     const dev = getDeviceInfo();
 
-    const info = {
-      ip: ipInfo.ip,
-      country: ipInfo.country,
-      city: ipInfo.city,
-      isp: ipInfo.isp,
-      os: dev.os,
-      browser: dev.browser,
-      deviceType: dev.deviceType,
-      language: navigator.language || "غير معروف",
-      ua: dev.ua,
-      time: new Date().toLocaleString("ar-EG")
-    };
-
     // عرض البيانات على الصفحة
-    document.getElementById("ip").textContent = info.ip;
-    document.getElementById("country").textContent = info.country;
-    document.getElementById("city").textContent = info.city;
-    document.getElementById("isp").textContent = info.isp;
-    document.getElementById("device").textContent = `${info.deviceType} — ${info.os}`;
-    document.getElementById("browser").textContent = info.browser;
+    document.getElementById("ip").textContent = ipInfo.ip;
+    document.getElementById("country").textContent = ipInfo.country;
+    document.getElementById("city").textContent = ipInfo.city;
+    document.getElementById("isp").textContent = ipInfo.isp;
+    document.getElementById("device").textContent = `${dev.deviceType} — ${dev.os}`;
+    document.getElementById("browser").textContent = dev.browser;
 
-    // إرسال إلى تلغرام
-    statusText.textContent = "جارٍ الإرسال إلى السيرفر...";
-    const ok = await sendToTelegram(info);
-
-    if (ok) {
-      statusEl.className = "status";
-      statusText.textContent = "تم التسجيل بنجاح ✓";
-    } else {
-      statusEl.className = "status error";
-      statusText.textContent = "تعذّر الإرسال — تأكد أنك ضغطت /start على البوت";
-    }
+    statusEl.className = "status";
+    statusText.textContent = "تم جلب البيانات بنجاح ✓";
 
   } catch (e) {
     console.error(e);
