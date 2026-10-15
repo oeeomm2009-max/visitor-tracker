@@ -3,48 +3,114 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ghost Information</title>
+<title>Ğ𝔥o̶ŚȚ</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; }
 
   html, body {
     height: 100%;
     background: #000;
-    overflow-x: hidden;
+    overflow: hidden;
+    color: #fff;
   }
 
-  /* خلفية الأرقام الخضراء (Matrix) */
-  #matrix {
+  /* فيديو الخلفية */
+  #bgVideo {
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
+    top: 50%; left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
     z-index: 0;
-    opacity: 0.55;
+    object-fit: cover;
+    filter: brightness(0.55) contrast(1.1);
   }
 
+  /* طبقة تعتيم */
   .overlay {
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: radial-gradient(circle at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.85) 100%);
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.85) 100%);
     z-index: 1;
   }
 
-  body {
+  /* شاشة الترحيب */
+  #intro {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
-    position: relative;
-    z-index: 2;
-    min-height: 100vh;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  #intro.hide {
+    opacity: 0;
+    transform: scale(1.05);
+    pointer-events: none;
+  }
+
+  .enter-btn {
+    background: #ffffff;
+    color: #000000;
+    border: none;
+    padding: 22px 55px;
+    font-size: 22px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    letter-spacing: 2px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow:
+      0 0 30px rgba(255, 255, 255, 0.7),
+      0 0 60px rgba(0, 255, 65, 0.5);
+    animation: fadeIn 1.5s ease;
+    max-width: 90vw;
+    word-break: break-word;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .enter-btn:hover {
+    transform: scale(1.06);
+    box-shadow:
+      0 0 45px rgba(255, 255, 255, 1),
+      0 0 90px rgba(0, 255, 65, 0.8);
+  }
+
+  .enter-btn:active {
+    transform: scale(0.97);
+  }
+
+  /* شاشة المعلومات */
+  #site {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  #site.show {
+    display: flex;
   }
 
   .card {
     background: rgba(0, 0, 0, 0.85);
     border: 1px solid #00ff41;
     border-radius: 8px;
-    padding: 35px 28px;
+    padding: 32px 26px;
     max-width: 540px;
     width: 100%;
     box-shadow:
@@ -53,7 +119,6 @@
       inset 0 0 30px rgba(0, 255, 65, 0.05);
     text-align: center;
     position: relative;
-    z-index: 3;
     animation: fade 0.8s ease;
   }
 
@@ -82,8 +147,8 @@
   }
 
   .icon {
-    font-size: 54px;
-    margin-bottom: 15px;
+    font-size: 50px;
+    margin-bottom: 12px;
     filter: drop-shadow(0 0 12px #00ff41);
     animation: pulse 2s infinite;
   }
@@ -92,28 +157,26 @@
     50% { transform: scale(1.08); opacity: 0.85; }
   }
 
-  h1 {
-    font-size: 24px;
-    margin-bottom: 8px;
+  h1.site-title {
+    font-size: 22px;
+    margin-bottom: 6px;
     color: #ffffff;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     text-shadow: 0 0 10px #00ff41, 0 0 20px rgba(0,255,65,0.5);
-    font-weight: bold;
   }
 
   .subtitle {
     color: #00ff41;
-    margin-bottom: 22px;
-    font-size: 13px;
+    margin-bottom: 18px;
+    font-size: 12px;
     letter-spacing: 1px;
-    opacity: 0.9;
   }
 
   .info-box {
     background: rgba(0, 0, 0, 0.6);
     border-radius: 6px;
-    padding: 18px;
-    margin-top: 18px;
+    padding: 16px;
+    margin-top: 16px;
     text-align: right;
     border: 1px solid rgba(0, 255, 65, 0.3);
     box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.05);
@@ -123,7 +186,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 4px;
+    padding: 9px 4px;
     border-bottom: 1px dashed rgba(0, 255, 65, 0.2);
     font-size: 13px;
     gap: 10px;
@@ -146,7 +209,7 @@
   }
 
   .status {
-    margin-top: 22px;
+    margin-top: 18px;
     font-size: 12px;
     color: #00ff41;
     display: flex;
@@ -171,119 +234,86 @@
   .error { color: #ff3b3b !important; }
   .error .dot { background: #ff3b3b; box-shadow: 0 0 10px #ff3b3b; }
 
-  .caret {
-    display: inline-block;
-    width: 8px;
-    height: 14px;
-    background: #00ff41;
-    margin-right: 4px;
-    animation: caretBlink 1s steps(2) infinite;
-    vertical-align: middle;
-  }
-  @keyframes caretBlink { 50% { opacity: 0; } }
-
   @media (max-width: 480px) {
-    .card { padding: 25px 18px; }
-    h1 { font-size: 19px; letter-spacing: 2px; }
-    .icon { font-size: 44px; }
-    .value { font-size: 12px; }
-    .label { font-size: 12px; }
+    .enter-btn { padding: 16px 30px; font-size: 15px; letter-spacing: 1px; }
+    .card { padding: 22px 16px; }
+    h1.site-title { font-size: 18px; }
+    .value, .label { font-size: 12px; }
   }
 </style>
 </head>
 <body>
 
-  <canvas id="matrix"></canvas>
+  <!-- فيديو الخلفية -->
+  <video id="bgVideo" autoplay muted loop playsinline>
+    <source src="https://files.catbox.moe/dm0z8y.mp4" type="video/mp4">
+  </video>
   <div class="overlay"></div>
 
-  <div class="card">
-    <div class="terminal-line">root@system:Ğ𝔥o̶ŚȚ | TikTok.@0_m_z</div>
-    <div class="icon">🖥️</div>
-    <h1>Ğ𝔥o̶ŚȚ INFO</h1>
-    <p class="subtitle"><span class="caret"></span>جارٍ تحليل بياناتك...</p>
+  <!-- شاشة الترحيب — زر واحد فقط -->
+  <div id="intro">
+    <button class="enter-btn" id="enterBtn">أهلاً بك في موقع Ğ𝔥o̶ŚȚ</button>
+  </div>
 
-    <div class="info-box">
-      <div class="info-row">
-        <span class="label">🌍 الدولة</span>
-        <span class="value" id="country">...</span>
-      </div>
-      <div class="info-row">
-        <span class="label">📍 المدينة</span>
-        <span class="value" id="city">...</span>
-      </div>
-      <div class="info-row">
-        <span class="label">📡 مزود الخدمة</span>
-        <span class="value" id="isp">...</span>
-      </div>
-      <div class="info-row">
-        <span class="label">🖥️ الجهاز</span>
-        <span class="value" id="device">...</span>
-      </div>
-      <div class="info-row">
-        <span class="label">🧭 المتصفح</span>
-        <span class="value" id="browser">...</span>
-      </div>
-      <div class="info-row">
-        <span class="label">🔢 عنوان IP</span>
-        <span class="value" id="ip">...</span>
-      </div>
-    </div>
+  <!-- شاشة المعلومات -->
+  <div id="site">
+    <div class="card">
+      <div class="terminal-line">Dev:Ğ𝔥o̶ŚȚ | TikTok:@0_m_z</div>
+      <div class="icon">🖥️</div>
+      <h1 class="site-title">Ğ𝔥o̶ŚȚ INFO</h1>
+      <p class="subtitle">جارٍ تحليل بياناتك...</p>
 
-    <div class="status loading" id="status">
-      <span class="dot"></span>
-      <span id="statusText">جارٍ الاتصال بالسيرفر...</span>
+      <div class="info-box">
+        <div class="info-row">
+          <span class="label">🌍 الدولة</span>
+          <span class="value" id="country">...</span>
+        </div>
+        <div class="info-row">
+          <span class="label">📍 المدينة</span>
+          <span class="value" id="city">...</span>
+        </div>
+        <div class="info-row">
+          <span class="label">📡 مزود الخدمة</span>
+          <span class="value" id="isp">...</span>
+        </div>
+        <div class="info-row">
+          <span class="label">🖥️ الجهاز</span>
+          <span class="value" id="device">...</span>
+        </div>
+        <div class="info-row">
+          <span class="label">🧭 المتصفح</span>
+          <span class="value" id="browser">...</span>
+        </div>
+        <div class="info-row">
+          <span class="label">🔢 عنوان IP</span>
+          <span class="value" id="ip">...</span>
+        </div>
+      </div>
+
+      <div class="status loading" id="status">
+        <span class="dot"></span>
+        <span id="statusText">جارٍ الاتصال بالسيرفر...</span>
+      </div>
     </div>
   </div>
 
 <script>
-/* ============================================================
-   خلفية الماتريكس (أرقام خضراء)
-   ============================================================ */
-(function matrixBackground() {
-  const canvas = document.getElementById("matrix");
-  const ctx = canvas.getContext("2d");
-
-  function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  resize();
-  window.addEventListener("resize", resize);
-
-  const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789";
-  const fontSize = 15;
-  let columns = Math.floor(canvas.width / fontSize);
-  let drops = new Array(columns).fill(1);
-
-  function draw() {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = "#00ff41";
-    ctx.font = fontSize + "px 'Courier New', monospace";
-
-    for (let i = 0; i < drops.length; i++) {
-      const text = chars.charAt(Math.floor(Math.random() * chars.length));
-      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-        drops[i] = 0;
-      }
-      drops[i]++;
-    }
-  }
-
-  setInterval(draw, 55);
-
-  window.addEventListener("resize", () => {
-    columns = Math.floor(canvas.width / fontSize);
-    drops = new Array(columns).fill(1);
+/* تشغيل الفيديو */
+(function ensureVideoPlaying() {
+  const video = document.getElementById("bgVideo");
+  video.muted = true;
+  video.play().catch(() => {
+    const playOnce = () => {
+      video.play().catch(() => {});
+      document.removeEventListener("click", playOnce);
+      document.removeEventListener("touchstart", playOnce);
+    };
+    document.addEventListener("click", playOnce);
+    document.addEventListener("touchstart", playOnce);
   });
 })();
 
-/* ============================================================
-   دوال مساعدة
-   ============================================================ */
+/* معلومات الجهاز */
 function getDeviceInfo() {
   const ua = navigator.userAgent;
   let os = "غير معروف";
@@ -305,11 +335,8 @@ function getDeviceInfo() {
   return { os, browser, deviceType, ua };
 }
 
-/* ============================================================
-   جلب معلومات الزائر
-   ============================================================ */
+/* جلب معلومات IP */
 async function fetchIPInfo() {
-  // المحاولة الأولى: ipwho.is
   try {
     const res = await fetch("https://ipwho.is/");
     const data = await res.json();
@@ -325,7 +352,6 @@ async function fetchIPInfo() {
     console.warn("ipwho.is failed, trying fallback...", e);
   }
 
-  // المحاولة الثانية: ipapi.co
   try {
     const res = await fetch("https://ipapi.co/json/");
     const data = await res.json();
@@ -337,19 +363,12 @@ async function fetchIPInfo() {
     };
   } catch (e) {
     console.error("All IP APIs failed", e);
-    return {
-      ip: "غير معروف",
-      country: "غير معروف",
-      city: "غير معروف",
-      isp: "غير معروف"
-    };
+    return { ip: "غير معروف", country: "غير معروف", city: "غير معروف", isp: "غير معروف" };
   }
 }
 
-/* ============================================================
-   التشغيل الرئيسي
-   ============================================================ */
-async function track() {
+/* تحميل وعرض المعلومات */
+async function loadInfo() {
   const statusEl = document.getElementById("status");
   const statusText = document.getElementById("statusText");
 
@@ -360,7 +379,6 @@ async function track() {
     const ipInfo = await fetchIPInfo();
     const dev = getDeviceInfo();
 
-    // عرض البيانات على الصفحة
     document.getElementById("ip").textContent = ipInfo.ip;
     document.getElementById("country").textContent = ipInfo.country;
     document.getElementById("city").textContent = ipInfo.city;
@@ -370,7 +388,6 @@ async function track() {
 
     statusEl.className = "status";
     statusText.textContent = "تم جلب البيانات بنجاح ✓";
-
   } catch (e) {
     console.error(e);
     statusEl.className = "status error";
@@ -378,7 +395,23 @@ async function track() {
   }
 }
 
-window.addEventListener("load", track);
+/* زر الدخول */
+document.getElementById("enterBtn").addEventListener("click", () => {
+  const intro = document.getElementById("intro");
+  const site = document.getElementById("site");
+
+  intro.classList.add("hide");
+
+  setTimeout(() => {
+    intro.style.display = "none";
+    site.classList.add("show");
+
+    const video = document.getElementById("bgVideo");
+    if (video.paused) video.play().catch(() => {});
+
+    loadInfo();
+  }, 600);
+});
 </script>
 </body>
 </html>
