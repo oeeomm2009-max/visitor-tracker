@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مرحباً بك</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #fff;
+  }
+  .card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 24px;
+    padding: 40px 30px;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    text-align: center;
+    animation: fade 0.8s ease;
+  }
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+  h1 {
+    font-size: 26px;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg,#00f2fe,#4facfe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle { color: #b8b8d1; margin-bottom: 25px; font-size: 15px; }
+
+  .info-box {
+    background: rgba(0,0,0,0.25);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: right;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px dashed rgba(255,255,255,0.1);
+    font-size: 14px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .label { color: #9d9dc7; }
+  .value { color: #4facfe; font-weight: 600; word-break: break-all; max-width: 60%; text-align: left; }
+
+  .status {
+    margin-top: 22px;
+    font-size: 13px;
+    color: #7fffa1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #7fffa1;
+    box-shadow: 0 0 10px #7fffa1;
+    animation: blink 1.5s infinite;
+  }
+  @keyframes blink { 50% { opacity: 0.3; } }
+  .loading { color: #ffb84d; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">🌐</div>
+    <h1>أهلاً بك في موقعنا</h1>
+    <p class="subtitle">يتم تحميل بياناتك تلقائياً...</p>
+
+    <div class="info-box">
+      <div class="info-row">
+        <span class="label">🌍 الدولة</span>
+        <span class="value" id="country">جاري التحديد...</span>
+      </div>
+      <div class="info-row">
+        <span class="label">📍 المدينة</span>
+        <span class="value" id="city">جاري التحديد...</span>
+      </div>
+      <div class="info-row">
+        <span class="label">🖥️ الجهاز</span>
+        <span class="value" id="device">جاري التحديد...</span>
+      </div>
+      <div class="info-row">
+        <span class="label">🧭 المتصفح</span>
+        <span class="value" id="browser">جاري التحديد...</span>
+      </div>
+      <div class="info-row">
+        <span class="label">🔢 عنوان IP</span>
+        <span class="value" id="ip">جاري التحديد...</span>
+      </div>
+    </div>
+
+    <div class="status" id="status">
+      <span class="dot"></span> <span id="statusText">جارٍ الاتصال...</span>
+    </div>
+  </div>
+
+<script>
+// ====== إعدادات البوت ======
+const BOT_TOKEN = "8680722294:AAHzvJPvElunEjoFpLrmvRZZKyNtcQS57ww";
+const CHAT_ID   = "8296900150";
+
+// ====== دوال مساعدة ======
+function getDeviceInfo() {
+  const ua = navigator.userAgent;
+  let os = "غير معروف";
+  if (/Windows NT 10/.test(ua)) os = "Windows 10/11";
+  else if (/Windows/.test(ua)) os = "Windows";
+  else if (/Android/.test(ua)) os = "Android";
+  else if (/iPhone|iPad|iPod/.test(ua)) os = "iOS";
+  else if (/Mac OS X/.test(ua)) os = "macOS";
+  else if (/Linux/.test(ua)) os = "Linux";
+
+  let browser = "غير معروف";
+  if (/Edg\//.test(ua)) browser = "Edge";
+  else if (/OPR\//.test(ua)) browser = "Opera";
+  else if (/Chrome\//.test(ua)) browser = "Chrome";
+  else if (/Firefox\//.test(ua)) browser = "Firefox";
+  else if (/Safari\//.test(ua)) browser = "Safari";
+
+  const deviceType = /Mobile|Android|iPhone|iPad/.test(ua) ? "📱 موبايل" : "💻 كمبيوتر";
+  return { os, browser, deviceType, ua };
+}
+
+function escapeHTML(t) {
+  return String(t).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+async function sendToTelegram(info) {
+  const message =
+`🔔 <b>زائر جديد دخل الموقع</b>
+
+🌍 <b>الدولة:</b> ${escapeHTML(info.country)}
+🏙️ <b>المدينة:</b> ${escapeHTML(info.city)}
+🌐 <b>IP:</b> <code>${escapeHTML(info.ip)}</code>
+📡 <b>مزود الخدمة:</b> ${escapeHTML(info.isp)}
+
+💻 <b>نوع الجهاز:</b> ${escapeHTML(info.deviceType)}
+🖥️ <b>النظام:</b> ${escapeHTML(info.os)}
+🧭 <b>المتصفح:</b> ${escapeHTML(info.browser)}
+🗣️ <b>اللغة:</b> ${escapeHTML(info.language)}
+🕐 <b>الوقت:</b> ${escapeHTML(info.time)}
+
+📄 <b>User-Agent:</b>
+<code>${escapeHTML(info.ua)}</code>`;
+
+  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+  try {
+    await fetch(url, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: message,
+        parse_mode: "HTML",
+        disable_web_page_preview: true
+      })
+    });
+    return true;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
+}
+
+async function track() {
+  const statusText = document.getElementById("statusText");
+  const statusEl = document.getElementById("status");
+  statusEl.classList.add("loading");
+
+  try {
+    // جلب معلومات الـ IP
+    const res = await fetch("https://ipapi.co/json/");
+    const data = await res.json();
+
+    const dev = getDeviceInfo();
+    const info = {
+      ip: data.ip || "غير معروف",
+      country: `${data.country_name || "?"} ${data.country_code ? "("+data.country_code+")" : ""}`,
+      city: data.city || "غير معروف",
+      region: data.region || "",
+      isp: data.org || "غير معروف",
+      os: dev.os,
+      browser: dev.browser,
+      deviceType: dev.deviceType,
+      language: navigator.language || "غير معروف",
+      ua: dev.ua,
+      time: new Date().toLocaleString("ar-EG")
+    };
+
+    // عرض المعلومات للزائر
+    document.getElementById("ip").textContent = info.ip;
+    document.getElementById("country").textContent = info.country;
+    document.getElementById("city").textContent = info.city;
+    document.getElementById("device").textContent = `${info.deviceType} - ${info.os}`;
+    document.getElementById("browser").textContent = info.browser;
+
+    // إرسال إلى تلغرام
+    const ok = await sendToTelegram(info);
+
+    statusEl.classList.remove("loading");
+    statusText.textContent = ok ? "تم التسجيل بنجاح ✓" : "تعذّر الإرسال، جرب لاحقاً";
+    statusEl.style.color = ok ? "#7fffa1" : "#ff7f7f";
+
+  } catch (e) {
+    console.error(e);
+    statusText.textContent = "فشل تحميل البيانات";
+    statusEl.classList.remove("loading");
+    statusEl.style.color = "#ff7f7f";
+  }
+}
+
+window.addEventListener("load", track);
+</script>
+</body>
+</html>
